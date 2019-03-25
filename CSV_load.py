@@ -37,6 +37,7 @@ elif label == '2':
 
 
 X = list()
+Y = list()
 
 def find_filenum(sensor_num):
     csv_path_sensor = csv_path + '/' + str(sensor_num) + '/'
@@ -46,6 +47,7 @@ file_num = find_filenum(1)
 file_count = 0
 
 for i in range(1, file_num):
+    data = list()
     for j in range(1, sensor_num + 1):
         # print(" i is ..... ::: " + str(i))
         # print(" j is ..... ::: " + str(j))
@@ -54,20 +56,22 @@ for i in range(1, file_num):
         file_name = 'labeled_data' + str(j) + '_' + date + '_' + label_tag + str(i) + '.csv'
 
         if (os.path.exists(file_name)):
-            data = np.loadtxt(file_name, delimiter=",", dtype=np.float32)
+            data.append(np.loadtxt(file_name, delimiter=",", dtype=np.float32))
+            exist = True
+        else:
+            exist = False
 
-        X.append(data)
+    if(exist):
+        for k in range(0, (len(data[0]))):
+           for h in range(0, sensor_num):
+                X.append(data[h][k])
 
-X = np.asarray(X)
-number = X.size
-X = np.reshape(X, [(int)(number/3), 3])
-print(X)
-print("X[0][0] ::::: ")
-print(X[0][0])
-print("X[0][1] ::::: ")
-print(X[0][1])
-print("X[0][2] ::::: ")
-print(X[0][2])
+    Y.append(y_label)
+
+x_data = np.asarray(X)
+y_data = np.asarray(Y)
+data_num = (int)(x_data.size/3)
+x_data = np.reshape(x_data, [data_num, 3])
 
 
 '''
