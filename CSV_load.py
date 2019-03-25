@@ -13,7 +13,9 @@ sensor_num = 3
 hz = 100
 
 model = keras.Sequential()
-model.add(keras.layers.LSTM(32, input_shape=(sensor_num ,hz)))
+model.add(keras.layers.LSTM(64, return_sequences=True, input_shape=(sensor_num ,hz)))
+model.add(keras.layers.Dropout(0.2))
+model.add(keras.layers.LSTM(32))
 model.add(keras.layers.Dropout(0.2))
 model.add(keras.layers.Dense(2, activation='softmax'))
 
@@ -76,29 +78,23 @@ y_data = np.asarray(Y)
 
 x_data = np.reshape(x_data, [(int)(len(x_data) / sensor_num), sensor_num, hz])
 
+x_validate = x_data[:100]
+y_validate = y_data[:100]
 
 print(x_data.shape)
 print(y_data.shape)
 
-validate = (int)(len(x_data) * 0.2)
-
-X_val = x_data[:validate]
-X_train_data = x_data[validate:]
-
-Y_val = y_data[:validate]
-Y_train_data = y_data[validate:]
-
-X_train, X_test, Y_train, Y_test = train_test_split(X_train_data, Y_train_data, test_size=0.33, random_state=321)
+X_train, X_test, Y_train, Y_test = train_test_split(x_data, y_data, test_size=0.33, random_state=321)
 
 history = model.fit(X_train,
                     Y_train,
                     epochs=10,
                     batch_size=100,
                     shuffle='True',
-                    validation_data=(X_val, Y_val),
+                    validation_data=(X_test, Y_test),
                     verbose=1)
 
-results = model.evaluate(X_test, Y_test)
+results = model.evaluate(x_validate, y_validate)
 
 print(results)
 
