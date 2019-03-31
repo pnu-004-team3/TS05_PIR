@@ -4,6 +4,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 import matplotlib.pyplot as plt
+import csv
 
 csv_nobody_path = 'PIR_data/new_csv/nobody/'
 csv_somebody_path = 'PIR_data/new_csv/somebody/'
@@ -24,7 +25,8 @@ model.add(keras.layers.Dense(2, activation='softmax'))
 model.summary()
 
 model.compile(optimizer=tf.train.AdamOptimizer(),
-              loss='binary_crossentropy',
+              loss='mean_squared_error',
+              #loss='binary_crossentropy',
               metrics=['acc'])
 
 X = list()
@@ -83,6 +85,8 @@ while(True):
     print((str)(file_count) + " files opened")
     print((str)(len(X)/sensor_num) + " dataes inserted")
 
+os.chdir(path_current)
+
 x_data = np.asarray(X)
 y_data = np.asarray(Y)
 
@@ -95,12 +99,12 @@ x_validate = x_data[:100]
 y_validate = y_data[:100]
 
 
-X_train, X_test, Y_train, Y_test = train_test_split(x_data, y_data, test_size=0.33, random_state=321)
+X_train, X_test, Y_train, Y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=321)
 
 history = model.fit(X_train,
                     Y_train,
                     epochs=50,
-                    batch_size=256,
+                    batch_size=128,
                     shuffle='True',
                     validation_data=(X_test, Y_test),
                     verbose=1)
@@ -124,13 +128,29 @@ epochs = range(1, len(acc) + 1)
 
 plt.plot(epochs, acc, 'bo', label='Training acc')
 plt.plot(epochs, val_acc, 'b', label='Validation acc')
+plt.plot(epochs, loss, 'ro', label="Training loss")
+plt.plot(epochs, val_loss, 'r', label="Validation loss")
 plt.title('Training and validation accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
 
 plt.show()
+
+#model.save("Mymodel")
+
+'''
+print("Layer[0] ::")
+print(len(model.layers[0].get_weights()))
+print("Layer[1] ::")
+print(model.layers[1].get_weights())
+print("Layer[2] ::")
+print(model.layers[2].get_weights())
+
+
+
 #print(X_train)
 #print(Y_train)
 #print(X_test)
 #print(Y_test)
+'''
