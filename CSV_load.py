@@ -4,7 +4,13 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 import matplotlib.pyplot as plt
-import csv
+import sys
+
+sys.getdefaultencoding()
+
+os.putenv('LANG', 'en_US.UTF-8')
+os.putenv('LC_ALL', 'en_US.UTF-8')
+
 
 csv_nobody_path = 'PIR_data/new_csv/nobody/'
 csv_somebody_path = 'PIR_data/new_csv/somebody/'
@@ -18,7 +24,9 @@ model = keras.Sequential()
 model.add(keras.layers.LSTM(64, return_sequences=True, input_shape=(sensor_num ,hz)))
 #model.add(keras.layers.LSTM(64, input_shape=(sensor_num ,hz)))
 model.add(keras.layers.Dropout(0.3))
-model.add(keras.layers.LSTM(32))
+model.add(keras.layers.LSTM(32, return_sequences=True))
+model.add(keras.layers.Dropout(0.3))
+model.add(keras.layers.LSTM(16))
 model.add(keras.layers.Dropout(0.3))
 model.add(keras.layers.Dense(2, activation='softmax'))
 
@@ -82,6 +90,8 @@ while(True):
 
                 Y.append(y_label)
 
+    print(len(X))
+
     print((str)(file_count) + " files opened")
     print((str)(len(X)/sensor_num) + " dataes inserted")
 
@@ -101,21 +111,19 @@ y_validate = y_data[:100]
 
 X_train, X_test, Y_train, Y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=321)
 
-history = model.fit(X_train,
-                    Y_train,
-                    epochs=50,
-                    batch_size=128,
-                    shuffle='True',
-                    validation_data=(X_test, Y_test),
-                    verbose=1)
+history_tensorboard = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
+
+model.fit(X_train, Y_train, epochs=1000, batch_size=128, shuffle='True', validation_data=(X_test, Y_test), verbose=1, callbacks=[history_tensorboard])
 
 results = model.evaluate(x_validate, y_validate)
 
+print("Validate data[loss, accuracy] :: ")
 print(results)
 
 print(model.predict_classes(X_test[:1, :], verbose=0))
 print('----------------------------------------------')
 
+'''
 history_dict = history.history
 history_dict.keys()
 
@@ -136,6 +144,7 @@ plt.ylabel('Accuracy')
 plt.legend()
 
 plt.show()
+'''
 
 #model.save("Mymodel")
 
