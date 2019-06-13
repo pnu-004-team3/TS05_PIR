@@ -69,8 +69,8 @@ with picamera.PiCamera() as camera:
 				tempeature_vol = Convert_volt(tempeature)
 
 				print("PIR :: ADC = %s(%d) voltage = %fV" % (hex(pir), pir, pir_vol))
-        		        print("LIGHT :: ADC = %s(%d) voltage = %fV" % (hex(light), light, light_vol))
-	        	        print("TEMP :: ADC = %s(%d) voltage = %fV" % (hex(tempeature), tempeature, tempeature_vol))
+        		print("LIGHT :: ADC = %s(%d) voltage = %fV" % (hex(light), light, light_vol))
+	        	print("TEMP :: ADC = %s(%d) voltage = %fV" % (hex(tempeature), tempeature, tempeature_vol))
 
 				print("Serial Number :: %d" % (serial_num))
 				print("")
@@ -99,6 +99,10 @@ with picamera.PiCamera() as camera:
 
 		except KeyboardInterrupt:
 			break;
+
+	f1.close()
+	f2.close()
+	f3.close()
 
 	camera.stop_preview()
 	camera.close()

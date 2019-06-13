@@ -1,0 +1,79 @@
+from keras.utils import *
+import tensorflow as tf
+import numpy as np
+from keras.models import model_from_json
+import Data_load_4 as dl
+
+#modelname = input("Type Model's name :: ")
+modelname = "Model_onlypir_lstm_ep2000"
+modelname_json = "Models/" + modelname + ".json"
+modelname_weight = "Models/" + modelname + ".h5"
+json_file = open(modelname_json,"r")
+
+loaded_model_json = json_file.read()
+json_file.close()
+
+model = tf.keras.models.model_from_json(loaded_model_json)
+model.load_weights(modelname_weight)
+print("Model Loaded...! :: " + modelname)
+
+DataX = list()
+DataY = list()
+
+dl.Data_load("None", DataX, DataY)
+
+dl.Data_load("Human", DataX, DataY)
+
+exist_none = list()
+exist_exist = list()
+none_none = list()
+none_exist = list()
+
+DataX = np.asarray(DataX)
+DataY = np.asarray(DataY)
+
+DataX = np.reshape(DataX, (int(DataX.__len__()/4), 4, 100))
+
+x_data =list()
+
+def decision(predict):
+    if predict[0][0] > predict[0][1]:
+        return "None"
+    else:
+        return "Exist"
+
+def predict_result(x_data, result, y_data,):
+    global exist_exist
+    global exist_none
+    global none_exist
+    global none_none
+
+    #say exist , but none
+    if result == "Exist" and y_data[0] == 1:
+        exist_none.append(x_data)
+    # say exist , and exist
+    elif result == "Exist" and y_data[0] == 0:
+        exist_exist.append(x_data)
+    # say none , and none
+    elif result == "None" and y_data[0] == 1:
+        none_none.append(x_data)
+    # say none, but exist
+    elif result == "None" and y_data[0] == 0:
+        none_exist.append(x_data)
+
+for i in range(len(DataX)):
+    x_data.append(DataX[i][0])
+
+x_data = np.asarray(x_data)
+x_data = np.reshape(x_data, (-1, 1, 100))
+
+for i in range(len(x_data)):
+    testdata = x_data[i]
+    testdata = np.reshape(testdata, (1, 1, 100))
+    result = decision(model.predict(testdata))
+    predict_result(testdata, result, DataY[i])
+
+print("Exist _ Exist :: " + str(len(exist_exist)))
+print("Exist _ None :: " + str(len(exist_none)))
+print("None _ Exist :: " + str(len(none_exist)))
+print("None _ None :: " + str(len(none_none)))
