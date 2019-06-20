@@ -1,3 +1,4 @@
+import Data_load_testdata as dlt
 import Data_load_4 as dl
 import os
 import numpy as np
@@ -23,7 +24,7 @@ modelname = input("Input model name to save :: ")
 totalepoch = 1000
 
 model = keras.Sequential()
-model.add(keras.layers.Conv2D(32, kernel_size=(3,3), input_shape=(1,10,10), data_format='channels_first', activation='relu'))
+model.add(keras.layers.Conv2D(32, kernel_size=(3,3), input_shape=(10, 10, 1), data_format='channels_last', activation='relu'))
 model.add(keras.layers.BatchNormalization())
 model.add(keras.layers.MaxPooling2D(pool_size=(2,2)))
 model.add(keras.layers.Conv2D(64, kernel_size=(3,3), activation='relu'))
@@ -32,12 +33,18 @@ model.add(keras.layers.MaxPooling2D(pool_size=(2,2)))
 
 model.add(keras.layers.Flatten())
 model.add(keras.layers.Dense(2,activation='softmax'))
+#model.add(keras.layers.Dense(2,activation='sigmoid'))
+
 
 model.summary()
 ## Data 순서 :: pir , light, temp , humid
-dl.Data_load("None", DataX, DataY)
+#dl.Data_load("None", DataX, DataY)
 
-dl.Data_load("Human", DataX, DataY)
+#dl.Data_load("Human", DataX, DataY)
+
+#dlt.Data_load("None", DataX, DataY)
+
+#dlt.Data_load("Human", DataX, DataY)
 
 DataX = np.asarray(DataX)
 DataY = np.asarray(DataY)
@@ -53,7 +60,7 @@ for i in range(len(DataX)):
     x_data.append(DataX[i][0])
 
 x_data = np.asarray(x_data)
-x_data = np.reshape(x_data, (-1, 1, 10, 10))
+x_data = np.reshape(x_data, (-1, 10, 10, 1))
 
 tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
 

@@ -3,6 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import keras
+import Data_load_testdata as dlt
 from keras.layers import Input, Dense, Concatenate, Conv2D
 from keras.models import Model
 from sklearn.model_selection import train_test_split
@@ -22,15 +23,15 @@ modelname = input("Input model name to save :: ")
 
 totalepoch = 1000
 
-inputPIR = Input(shape=(1, 10, 10))
+inputPIR = Input(shape=(10, 10, 1))
 inputOther = Input(shape=(3,))
 
-model_x1 = Conv2D(32, kernel_size=(3,3), input_shape=(1,10,10),  data_format='channels_first', activation='relu')(inputPIR)
-model_x1 = keras.layers.BatchNormalization()(model_x1)
-model_x1 = keras.layers.MaxPooling2D(pool_size=(2,2))(model_x1)
-model_x1 = Conv2D(64, kernel_size=(3,3), activation='relu')(model_x1)
-model_x1 = keras.layers.BatchNormalization()(model_x1)
-model_x1 = keras.layers.MaxPooling2D(pool_size=(2,2))(model_x1)
+model_x1 = Conv2D(32, kernel_size=(3,3), input_shape=(10, 10, 1),  data_format='channels_last', activation='relu', name="Conv1")(inputPIR)
+model_x1 = keras.layers.BatchNormalization(name="Batch1")(model_x1)
+model_x1 = keras.layers.MaxPooling2D(pool_size=(2,2),name="Max1")(model_x1)
+model_x1 = Conv2D(64, kernel_size=(3,3), activation='relu', name="Conv2")(model_x1)
+model_x1 = keras.layers.BatchNormalization(name="Batch2")(model_x1)
+model_x1 = keras.layers.MaxPooling2D(pool_size=(2,2), name="Max2")(model_x1)
 model_x1 = keras.layers.Flatten()(model_x1)
 
 model_x2 = Dense(1, input_shape=(3,))(inputOther)
@@ -38,15 +39,20 @@ model_x2 = Dense(1, input_shape=(3,))(inputOther)
 merged = Concatenate(axis=1)([model_x1, model_x2])
 
 model_x3 = Dense(2, activation='softmax')(merged)
+#model_x3 = Dense(2, activation='sigmoid')(merged)
 
 model = Model(inputs=[inputPIR, inputOther], outputs=model_x3)
 
 model.summary()
 
 ## Data 순서 :: pir , light, temp , humid
-dl.Data_load("None", DataX, DataY)
+#dl.Data_load("None", DataX, DataY)
 
-dl.Data_load("Human", DataX, DataY)
+#dl.Data_load("Human", DataX, DataY)
+
+dlt.Data_load("None", DataX, DataY)
+
+dlt.Data_load("Human", DataX, DataY)
 
 DataX = np.asarray(DataX)
 DataY = np.asarray(DataY)
@@ -65,7 +71,7 @@ x_data_other_test = list()
 
 tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
 
-model.compile(optimizer=tf.train.AdamOptimizer(learning_rate=0.001),
+model.compile(optimizer=tf.train.AdamOptimizer(learning_rate=0.0005),
               loss='mean_squared_error',
               metrics=['acc'])
 
@@ -86,9 +92,9 @@ for i in range(len(X_test)):
 x_data = np.asarray(x_data)
 x_data_other = np.asarray(x_data_other)
 
-x_data = np.reshape(x_data, (-1, 1, 10, 10))
+x_data = np.reshape(x_data, (-1, 10, 10, 1))
 x_data_other = np.reshape(x_data_other, (-1, 3))
-x_data_test = np.reshape(x_data_test, (-1, 1, 10, 10))
+x_data_test = np.reshape(x_data_test, (-1, 10, 10, 1))
 x_data_other_test = np.reshape(x_data_other_test, (-1,3))
 
 k = 0
@@ -128,11 +134,8 @@ with open("Models/" + modelname + ".json", "w") as json_file :
 
 model.save_weights("Models/" + modelname + ".h5")
 
-
-
 print(modelname)
 print("Model Saved...!")
-
 print("Train Dataset .. :: ")
 print(X_train.shape)
 print("Validate Dataset .. :: ")

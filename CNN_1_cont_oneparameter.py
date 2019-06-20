@@ -1,4 +1,5 @@
 import Data_load_4 as dl
+import Data_load_testdata as dlt
 import os
 import numpy as np
 import tensorflow as tf
@@ -44,10 +45,13 @@ model = Model(inputs=[inputPIR, inputOther], outputs=model_x3)
 model.summary()
 
 ## Data 순서 :: pir , light, temp , humid
-dl.Data_load("None", DataX, DataY)
+#dl.Data_load("None", DataX, DataY)
 
-dl.Data_load("Human", DataX, DataY)
+#dl.Data_load("Human", DataX, DataY)
 
+dlt.Data_load("None", DataX, DataY)
+
+dlt.Data_load("Human", DataX, DataY)
 DataX = np.asarray(DataX)
 DataY = np.asarray(DataY)
 
@@ -76,18 +80,18 @@ for i in range(len(X_train)):
     #Light
     x_data_other.append(X_train[i][1][0])
     #Temp
-    #x_data_other.append(X_train[i][2][0])
+    x_data_other.append(X_train[i][2][0])
     #Humid
-    #x_data_other.append(X_train[i][3][0])
+    x_data_other.append(X_train[i][3][0])
 
 for i in range(len(X_test)):
     x_data_test.append(X_test[i][0])
     #Light
-    x_data_other_test.append(X_test[i][1][0])
+    #x_data_other_test.append(X_test[i][1][0])
     #Temp
     #x_data_other_test.append(X_test[i][2][0])
     #Humid
-    #x_data_other_test.append(X_test[i][3][0])
+    x_data_other_test.append(X_test[i][3][0])
 
 x_data = np.asarray(x_data)
 x_data_other = np.asarray(x_data_other)

@@ -8,7 +8,7 @@ import Data_load_4 as dl
 #modelname = "Model4_lstm_drop_adam_ep1000"
 #modelname = "Model4_I3d3_ep500_case3"
 #modelname = "Model4_ep1500_cutdatafor2_lr0002"
-modelname = "Model_cnn_merge_ep1000"
+modelname = "Model_cnn_merge_ep2000"
 modelname_json = "Models/" + modelname + ".json"
 modelname_weight = "Models/" + modelname + ".h5"
 

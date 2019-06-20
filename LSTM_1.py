@@ -21,9 +21,7 @@ modelname = input("Input model name to save :: ")
 totalepoch = 2000
 
 model = keras.Sequential()
-model.add(keras.layers.LSTM(128, input_shape=(1,100), return_sequences=True))
-model.add(keras.layers.LSTM(128, input_shape=(1,100), return_sequences=True))
-model.add(keras.layers.LSTM(128, input_shape=(1,100), return_sequences=True))
+model.add(keras.layers.LSTM(512, input_shape=(1,100), return_sequences=True))
 model.add(keras.layers.Flatten())
 #model.add(keras.layers.LSTM(256, return_sequences=True))
 model.add(keras.layers.Dense(2, activation='sigmoid'))
